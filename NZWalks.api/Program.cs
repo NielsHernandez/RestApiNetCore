@@ -21,6 +21,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectio
 //injecting repository
 
 builder.Services.AddScoped<IRegionRepository, SQLRegionRepository>();
+builder.Services.AddScoped<IWalkRepository, SQLWalkRepository>();
 
 //injecting automapper
 
