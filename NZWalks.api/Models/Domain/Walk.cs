@@ -15,10 +15,10 @@
 
         //this model will have FK relate on the DB
 
-        public Guid DifficultyId  { get; set; }
+        //public Guid DifficultyId  { get; set; }
 
 
-        public Guid RegionId { get; set; }
+        //public Guid RegionId { get; set; }
 
         //navigation properties
 
