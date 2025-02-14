@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using NZWalks.api.Models.Domain;
 using NZWalks.api.Models.DTO;
 using NZWalks.api.Repositories;
+using System.Threading.Tasks;
 
 namespace NZWalks.api.Controllers
 {
@@ -65,6 +66,53 @@ namespace NZWalks.api.Controllers
             return Ok(mapper.Map<WalkDto>(walkDomainModel));
 
         }
+
+
+        // Update walk by id
+        // Put: /api/Walks/{id}
+        [HttpPut]
+        [Route("{id:Guid}")]
+
+        public async Task<IActionResult> Update([FromRoute] Guid id, UpdateWalkRequestDto updateWalkRequestDto)
+        {
+
+            var walkDomainModel = mapper.Map<Walk>(updateWalkRequestDto);
+
+
+            walkDomainModel = await walkRepository.UpdateAsync(id, walkDomainModel);
+
+            //check if null
+
+            if(walkDomainModel == null) return NotFound();
+
+
+
+
+            return Ok(mapper.Map<WalkDto>(walkDomainModel));
+
+        }
+
+
+        //Delete a walk by id
+
+        //Delete: /api/walks/{id}
+
+        [HttpDelete]
+        [Route("{id:Guid}")]
+
+        public async Task<IActionResult> Delete(Guid id)
+        {
+
+            var deleteWalkDomainModel = await walkRepository.DeleteAsync(id);
+
+            if (deleteWalkDomainModel == null)
+            { return NotFound(); }
+
+
+            return Ok(mapper.Map<WalkDto>(deleteWalkDomainModel));
+
+        }
+
 
 
     }
