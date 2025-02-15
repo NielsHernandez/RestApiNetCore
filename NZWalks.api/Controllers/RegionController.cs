@@ -6,6 +6,7 @@ using NZWalks.api.Data;
 using NZWalks.api.Models.Domain;
 using NZWalks.api.Models.DTO;
 using NZWalks.api.Repositories;
+using System.Diagnostics.Eventing.Reader;
 
 
 
@@ -107,37 +108,49 @@ namespace NZWalks.api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] AddRegionRequestDto addRegionRequestDto)
         {
-            //Map or Convert DTO to Domain Model
 
-           /* var regionDomainModel = new Region
-            {
-                Code = addRegionRequestDto.Code,
-                Name = addRegionRequestDto.Name,
-                RegionImageUrl = addRegionRequestDto.RegionImageUrl
-            };*/
+            if(ModelState.IsValid){
 
-            var regionDomainModel = mapper.Map<Region>(addRegionRequestDto);
+                //Map or Convert DTO to Domain Model
 
-            //Use domain model to create a Region
+                /* var regionDomainModel = new Region
+                 {
+                     Code = addRegionRequestDto.Code,
+                     Name = addRegionRequestDto.Name,
+                     RegionImageUrl = addRegionRequestDto.RegionImageUrl
+                 };*/
 
-            await regionRepository.CreateAsync(regionDomainModel);
-            //await regionRepository.SaveChangesAsync();
+                var regionDomainModel = mapper.Map<Region>(addRegionRequestDto);
 
-            //Map domain model back to DTO
+                //Use domain model to create a Region
 
-            /*var regionDto = new RegionDto
-            {
-                Id = regionDomainModel.Id,
-                Code = regionDomainModel.Code,
-                Name = regionDomainModel.Name,
-                RegionImageUrl = regionDomainModel.RegionImageUrl
-            };*/
+                await regionRepository.CreateAsync(regionDomainModel);
+                //await regionRepository.SaveChangesAsync();
 
-            var regionDto = mapper.Map<RegionDto>(regionDomainModel);
+                //Map domain model back to DTO
+
+                /*var regionDto = new RegionDto
+                {
+                    Id = regionDomainModel.Id,
+                    Code = regionDomainModel.Code,
+                    Name = regionDomainModel.Name,
+                    RegionImageUrl = regionDomainModel.RegionImageUrl
+                };*/
+
+                var regionDto = mapper.Map<RegionDto>(regionDomainModel);
 
 
 
-            return CreatedAtAction(nameof(GetById), new {id = regionDto.Id}, regionDto);
+                return CreatedAtAction(nameof(GetById), new { id = regionDto.Id }, regionDto);
+
+            }
+            else{
+
+                return BadRequest(ModelState);
+
+            }
+
+           
         }
 
         //method to pust modify a region
@@ -184,6 +197,8 @@ namespace NZWalks.api.Controllers
             var regionDto = mapper.Map<RegionDto>(regionDomainModel);
 
             return Ok(regionDto);
+
+
         }
 
         //delete region
@@ -194,30 +209,41 @@ namespace NZWalks.api.Controllers
 
         public async Task<IActionResult> DeleteRegion([FromRoute] Guid id)
         {
+
+            if (ModelState.IsValid) {
+
+                var regionDomain = await regionRepository.DeleteAsync(id);
+
+                if (regionDomain == null)
+                {
+                    return NotFound();
+
+                }
+
+                //mapping to dto
+
+                /* var regionDto = new RegionDto
+                 {
+                     Id = regionDomain.Id,
+                     Code = regionDomain.Code,
+                     Name = regionDomain.Name,
+                     RegionImageUrl = regionDomain.RegionImageUrl
+                 };*/
+
+
+                var regionDto = mapper.Map<RegionDto>(regionDomain);
+
+                return Ok(regionDto);
+
+            } else { 
+
+
+                return BadRequest(ModelState);
+            
+            }
             //find the region
 
-            var regionDomain = await regionRepository.DeleteAsync(id);
-
-            if (regionDomain == null)
-            {
-                return NotFound();
-
-            }
-
-            //mapping to dto
-
-           /* var regionDto = new RegionDto
-            {
-                Id = regionDomain.Id,
-                Code = regionDomain.Code,
-                Name = regionDomain.Name,
-                RegionImageUrl = regionDomain.RegionImageUrl
-            };*/
-           
-
-            var regionDto = mapper.Map<RegionDto>(regionDomain);
-
-            return Ok(regionDto);
+            
         }
 
     }
