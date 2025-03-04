@@ -18,6 +18,10 @@ namespace NZWalks.api.Data
 
         public DbSet<Walk> Walks { get; set; }
 
+        //for images
+
+        public DbSet<Image> Images { get; set; }
+
 
         //add data
         protected override void OnModelCreating(ModelBuilder modelBuilder)

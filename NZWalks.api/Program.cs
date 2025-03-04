@@ -7,8 +7,14 @@ using NZWalks.api.Mappings;
 using NZWalks.api.Repositories;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//adding httpContext accessor to using on the file upload repository 
+
+builder.Services.AddHttpContextAccessor();
 
 // Add services to the container.
 
@@ -68,7 +74,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("NZWalksAuthConne
 builder.Services.AddScoped<IRegionRepository, SQLRegionRepository>();
 builder.Services.AddScoped<IWalkRepository, SQLWalkRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
-
+builder.Services.AddScoped<IImageRepository, LocalImageRepository>();
 //injecting automapper
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
@@ -125,6 +131,14 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+//adding a fileProvider 
+
+app.UseStaticFiles(new StaticFileOptions{ 
+
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Images")),
+        RequestPath = "/Images"
+});
 
 app.MapControllers();
 
